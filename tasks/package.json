@@ -2,9 +2,9 @@
   "name": "tasks",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Peter Kappelt <kappelt.peter@gmail.com>",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "PROPRIETARY",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
