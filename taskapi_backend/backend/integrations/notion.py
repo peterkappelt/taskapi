@@ -1,6 +1,6 @@
 from __future__ import annotations
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional
 import requests
 from dataclasses import dataclass
 from django.utils import timezone
@@ -19,23 +19,25 @@ class NotionDb:
 class NotionDbInfo:
     _info: object
 
-    def _fields_of_type(self, type: str) -> List[Tuple[str, str]]:
-        return [
-            (f, v["id"])
-            for f, v in self._info["properties"].items()
-            if v["type"] == type
-        ]
+    def _fields_of_type(self, type: str) -> Dict[str, str]:
+        return {
+            v["id"]: f for f, v in self._info["properties"].items() if v["type"] == type
+        }
+
+    @property
+    def id(self) -> str:
+        return self._info["id"]
 
     @property
     def title(self) -> str:
         return " ".join([t["plain_text"] for t in self._info["title"]])
 
     @property
-    def date_fields(self) -> List[Tuple[str, str]]:
+    def date_fields(self) -> Dict[str, str]:
         return self._fields_of_type("date")
 
     @property
-    def checkbox_fields(self) -> List[Tuple[str, str]]:
+    def checkbox_fields(self) -> Dict[str, str]:
         return self._fields_of_type("checkbox")
 
 
