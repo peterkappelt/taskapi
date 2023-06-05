@@ -26,6 +26,17 @@ class UserConnection(models.Model):
     def notion_available(self):
         return self._has_socialtoken_for_provider("taskapi_notion")
 
+    @property
+    def notion_name(self):
+        if not self.notion_available:
+            return None
+        connection = self.user.socialaccount_set.filter(
+            provider="taskapi_notion"
+        ).first()
+        owner = connection.extra_data.get("owner", {}).get("user", {}).get("name", None)
+        workspace = connection.extra_data.get("workspace_name", None)
+        return f"{owner} ({workspace})"
+
     def notion_api(self):
         if not self.notion_available:
             return None
@@ -42,6 +53,13 @@ class UserConnection(models.Model):
     def g_tasks_available(self):
         # TODO check if the scope of the token actually allows access to tasks
         return self._has_socialtoken_for_provider("google")
+
+    @property
+    def g_tasks_name(self):
+        if not self.g_tasks_available:
+            return None
+        connection = self.user.socialaccount_set.filter(provider="google").first()
+        return connection.extra_data.get("name", None)
 
     def g_tasks_api(self):
         if not self.g_tasks_available:
