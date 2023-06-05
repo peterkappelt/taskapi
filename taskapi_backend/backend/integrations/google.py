@@ -8,6 +8,12 @@ from allauth.socialaccount.models import SocialToken
 
 
 @dataclass
+class GoogleTasklist:
+    id: str
+    title: str
+
+
+@dataclass
 class GoogleTask:
     _info: object
 
@@ -64,6 +70,10 @@ class GoogleTaskapi:
             token_uri="https://oauth2.googleapis.com/token",
         )
         self.api = build("tasks", "v1", credentials=credentials)
+
+    def taskLists(self):
+        list = self.api.tasklists().list().execute()
+        return [GoogleTasklist(x["id"], x["title"]) for x in list["items"]]
 
     def createTask(
         self, tasklist_id: str, title: str, due: datetime, done: Optional[bool]
