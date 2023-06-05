@@ -16,23 +16,23 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from allauth.account.views import logout
-from backend.notion_oauth_provider.views import (
-    oauth2_login as notion_login,
-    oauth2_callback as notion_callback,
-)
+
+# from backend.notion_oauth_provider.views import (
+#    oauth2_login as notion_login,
+#    oauth2_callback as notion_callback,
+# )
 
 urlpatterns = [
-    path("backend/", include("backend.urls")),
+    path("api/", include("backend.urls")),
     path("admin/", admin.site.urls),
     path(
         "accounts/", include("allauth.urls")
     ),  # TODO only include necessary social provider URLs
-    path("accounts/logout/", logout, name="account_logout"),
-    path("accounts/taskapi_notion/login/", notion_login, name="notion_login"),
-    path(
-        "accounts/taskapi_notion/login/callback/",
-        notion_callback,
-        name="notion_callback",
-    ),
+    # path("accounts/logout/", logout, name="account_logout"),
+    # path("accounts/taskapi_notion/login/", notion_login, name="notion_login"),
+    # path(
+    #    "accounts/taskapi_notion/login/callback/",
+    #    notion_callback,
+    #    name="notion_callback",
+    # ),
 ]
