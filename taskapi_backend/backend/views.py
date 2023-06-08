@@ -131,8 +131,17 @@ class SyncConfigDetail(GenericAPIView):
         except SyncConfig.DoesNotExist:
             raise Http404
 
+    def _get_first_object(self, user):
+        obj = cast(SyncConfig, user.syncconfig_set.first())
+        if obj is None:
+            raise Http404
+        return obj
+
     def get(self, request, pk):
-        conf = self._get_object(request.user, pk)
+        if pk == "_first":
+            conf = self._get_first_object(request.user)
+        else:
+            conf = self._get_object(request.user, pk)
         return Response(SyncConfigSerializer(conf).data)
 
     def delete(self, request, pk):
