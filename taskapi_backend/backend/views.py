@@ -101,10 +101,14 @@ class SyncConfigList(GenericAPIView):
     serializer_class = SyncConfigSerializer
     schema = TaggedAutoSchema()
 
+    def get_queryset(self):
+        user = self.request.user
+        return user.syncconfig_set.all()
+
     def get(self, request):
-        user = request.user
-        confs = user.syncconfig_set.all()
-        return Response(SyncConfigPartialSerializer(confs, many=True).data)
+        return Response(
+            SyncConfigPartialSerializer(self.get_queryset(), many=True).data
+        )
 
     def post(self, request):
         serializer = SyncConfigSerializer(
