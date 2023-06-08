@@ -1,6 +1,5 @@
 from typing import cast
 from django.http import Http404
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -13,9 +12,13 @@ from .serializers import (
     SyncConfigPartialSerializer,
 )
 from .models import SyncConfig, UserConnection
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
 
 
-class Me(APIView):
+class Me(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         user = request.user
         cons = user.userconnection
@@ -30,7 +33,9 @@ class Me(APIView):
         return Response(serializer.data)
 
 
-class AbstractNotionView(APIView):
+class AbstractNotionView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
     def _api(self, user):
         cons = cast(UserConnection, user.userconnection)
         api = cons.notion_api()
@@ -55,7 +60,8 @@ class NotionDetail(AbstractNotionView):
         return Response(NotionDbInfoSerializer(db_info).data)
 
 
-class GTasksList(APIView):
+class GTasksList(GenericAPIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         user = request.user
         cons = cast(UserConnection, user.userconnection)
@@ -66,7 +72,9 @@ class GTasksList(APIView):
         return Response(GTasksTasklistsSerializer(lists, many=True).data)
 
 
-class SyncConfigList(APIView):
+class SyncConfigList(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         user = request.user
         confs = user.syncconfig_set.all()
@@ -82,7 +90,9 @@ class SyncConfigList(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class SyncConfigDetail(APIView):
+class SyncConfigDetail(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
     def _get_object(self, user, pk):
         try:
             return cast(SyncConfig, user.syncconfig_set.get(pk=pk))
