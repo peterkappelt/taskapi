@@ -13,11 +13,25 @@ from .serializers import (
 )
 from .models import SyncConfig, UserConnection
 from rest_framework.generics import GenericAPIView
+from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.permissions import IsAuthenticated
+
+
+class TaggedAutoSchema(AutoSchema):
+    def get_tags(self, path, method):
+        return ["tasks"]
 
 
 class Me(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = MeSerializer
+    schema = TaggedAutoSchema()
+    # this is a workaroung for OpenAPI schema generation
+    # by default, the `get` method here is assumed to do a list operation
+    # by explicitely setting action to "retrieve", AutoSchema will assume
+    # that this view does a retrieve operation
+    # action doesn't seem to have any other effects
+    action = "retrieve"
 
     def get(self, request):
         user = request.user
@@ -45,6 +59,9 @@ class AbstractNotionView(GenericAPIView):
 
 
 class NotionList(AbstractNotionView):
+    serializer_class = NotionDbListSerializer
+    schema = TaggedAutoSchema()
+
     def get(self, request):
         api = self._api(request.user)
         dbs = api.getAvailableDbs()
@@ -52,6 +69,9 @@ class NotionList(AbstractNotionView):
 
 
 class NotionDetail(AbstractNotionView):
+    serializer_class = NotionDbInfoSerializer
+    schema = TaggedAutoSchema()
+
     def get(self, request, db_id):
         api = self._api(request.user)
         db_info = api.getDbInfo(db_id)
@@ -62,6 +82,9 @@ class NotionDetail(AbstractNotionView):
 
 class GTasksList(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = GTasksTasklistsSerializer
+    schema = TaggedAutoSchema()
+
     def get(self, request):
         user = request.user
         cons = cast(UserConnection, user.userconnection)
@@ -74,6 +97,9 @@ class GTasksList(GenericAPIView):
 
 class SyncConfigList(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    # TODO `get` is a partial Serializer
+    serializer_class = SyncConfigSerializer
+    schema = TaggedAutoSchema()
 
     def get(self, request):
         user = request.user
@@ -92,6 +118,8 @@ class SyncConfigList(GenericAPIView):
 
 class SyncConfigDetail(GenericAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = SyncConfigSerializer
+    schema = TaggedAutoSchema()
 
     def _get_object(self, user, pk):
         try:

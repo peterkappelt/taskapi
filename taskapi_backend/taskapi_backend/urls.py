@@ -16,20 +16,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.views.decorators.csrf import csrf_exempt
 
-# from backend.notion_oauth_provider.views import (
-#    oauth2_login as notion_login,
-#    oauth2_callback as notion_callback,
-# )
+from backend.notion_oauth_provider.views import (
+    oauth2_login as notion_login,
+    #    oauth2_callback as notion_callback,
+)
+from allauth.socialaccount.providers.google.views import (
+    oauth2_login as google_login,
+)
 
 urlpatterns = [
     path("api/", include("backend.urls")),
     path("admin/", admin.site.urls),
     path(
+        "accounts/taskapi_notion/login/", csrf_exempt(notion_login), name="notion_login"
+    ),  # CSRF exemption since we calling it from JS frontend
+    path("accounts/google/login/", csrf_exempt(google_login)),
+    path(
         "accounts/", include("allauth.urls")
     ),  # TODO only include necessary social provider URLs
     # path("accounts/logout/", logout, name="account_logout"),
-    # path("accounts/taskapi_notion/login/", notion_login, name="notion_login"),
     # path(
     #    "accounts/taskapi_notion/login/callback/",
     #    notion_callback,
