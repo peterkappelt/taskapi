@@ -19,6 +19,7 @@ Deprecated==1.2.14
 Django==4.2.1
 django-allauth==0.54.0
 django-celery-results==2.5.1
+django-cors-headers==4.0.0
 djangorestframework==3.14.0
 flower==1.2.0
 google-api-core==2.11.0

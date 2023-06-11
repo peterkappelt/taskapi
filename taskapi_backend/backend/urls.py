@@ -13,6 +13,7 @@ urlpatterns = [
         ),
         name="openapi-schema",
     ),
+    path("csrf/", views.CsrfToken.as_view()),
     path("me/", views.Me.as_view()),
     path("notion/", views.NotionList.as_view()),
     path("notion/<str:db_id>/", views.NotionDetail.as_view()),

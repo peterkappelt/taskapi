@@ -10,16 +10,28 @@ from .serializers import (
     GTasksTasklistsSerializer,
     SyncConfigSerializer,
     SyncConfigPartialSerializer,
+    CsrfSerializer,
 )
 from .models import SyncConfig, UserConnection
 from rest_framework.generics import GenericAPIView
 from rest_framework.schemas.openapi import AutoSchema
 from rest_framework.permissions import IsAuthenticated
+from django.middleware.csrf import get_token
 
 
 class TaggedAutoSchema(AutoSchema):
     def get_tags(self, path, method):
         return ["tasks"]
+
+
+class CsrfToken(GenericAPIView):
+    serializer_class = CsrfSerializer
+    permission_classes = [IsAuthenticated]
+    schema = TaggedAutoSchema()
+    action = "retrieve"
+
+    def get(self, request):
+        return Response(CsrfSerializer({"csrftoken": get_token(request)}).data)
 
 
 class Me(GenericAPIView):

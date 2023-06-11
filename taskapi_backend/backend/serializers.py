@@ -2,6 +2,10 @@ from rest_framework import serializers
 from .models import SyncConfig
 
 
+class CsrfSerializer(serializers.Serializer):
+    csrftoken = serializers.CharField(read_only=True)
+
+
 class MeSerializer(serializers.Serializer):
     id = serializers.UUIDField(read_only=True)
     email = serializers.EmailField(read_only=True)
