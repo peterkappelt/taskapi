@@ -85,7 +85,7 @@ const MissingHint = ({
         Your Notion Database will now be synchronized with Google Tasks (and
         vice versa).
         <br />
-        Please note that it'll take up to{" "}
+        Please note that it will take up to&nbsp;
         <TypographyInlineCode>2</TypographyInlineCode> minutes for any updates
         to synchronize.
       </>
@@ -115,7 +115,7 @@ const SyncConfEditor = ({ me }: { me: Me }) => {
         setConf(complete); //update the partial conf, but don't do API call
         return;
       }
-      
+
       let res: SyncConfig;
       if (complete.id) {
         // id is set -> conf exists -> patch
