@@ -1,0 +1,271 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /api/csrf/:
+    get:
+      operationId: retrieveCsrf
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Csrf'
+          description: ''
+      tags:
+      - tasks
+  /api/me/:
+    get:
+      operationId: retrieveMe
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+      tags:
+      - tasks
+  /api/notion/:
+    get:
+      operationId: listNotionDbLists
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotionDbList'
+          description: ''
+      tags:
+      - tasks
+  /api/notion/{db_id}/:
+    get:
+      operationId: retrieveNotionDbInfo
+      description: ''
+      parameters:
+      - name: db_id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotionDbInfo'
+          description: ''
+      tags:
+      - tasks
+  /api/gtasks/:
+    get:
+      operationId: listGTasksTasklists
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GTasksTasklists'
+          description: ''
+      tags:
+      - tasks
+  /api/syncconf/:
+    get:
+      operationId: listSyncConfigs
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SyncConfig'
+          description: ''
+      tags:
+      - tasks
+    post:
+      operationId: createSyncConfig
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncConfig'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SyncConfig'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SyncConfig'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncConfig'
+          description: ''
+      tags:
+      - tasks
+  /api/syncconf/{id}/:
+    get:
+      operationId: retrieveSyncConfig
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncConfig'
+          description: ''
+      tags:
+      - tasks
+    patch:
+      operationId: partialUpdateSyncConfig
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncConfig'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SyncConfig'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SyncConfig'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncConfig'
+          description: ''
+      tags:
+      - tasks
+    delete:
+      operationId: destroySyncConfig
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - tasks
+components:
+  schemas:
+    Csrf:
+      type: object
+      properties:
+        csrftoken:
+          type: string
+          readOnly: true
+    Me:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        notion:
+          type: string
+          readOnly: true
+        g_tasks:
+          type: string
+          readOnly: true
+    NotionDbList:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+    NotionDbInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        date_fields:
+          type: object
+          readOnly: true
+        checkbox_fields:
+          type: object
+          readOnly: true
+    GTasksTasklists:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+    SyncConfig:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        notion_db:
+          type: string
+          maxLength: 36
+        notion_db_date_prop_id:
+          type: string
+          maxLength: 32
+        notion_db_done_prop_id:
+          type: string
+          nullable: true
+          maxLength: 32
+        g_tasks_tasklist:
+          type: string
+          nullable: true
+      required:
+      - notion_db
+      - notion_db_date_prop_id
