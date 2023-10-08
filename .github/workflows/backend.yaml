@@ -39,3 +39,32 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  validate-openapi-spec:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - name: Install PIP dependencies
+        working-directory: ./taskapi_backend
+        run: pip install -r requirements.txt
+      - name: Generate empty settings.py
+        working-directory: ./taskapi_backend
+        run: echo "from taskapi_backend.settings_base import *" > ./taskapi_backend/settings.py
+      - name: Generate OpenAPI spec from code
+        working-directory: ./taskapi_backend
+        run: python manage.py generateschema > ${{ runner.temp }}/openapi.yaml
+      - name: Store schema as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ runner.temp }}/openapi.yaml
+      - name: Validate committed schema is up-to-date
+        working-directory: ./taskapi_backend
+        run: |
+          cmp ./openapi.yaml ${{ runner.temp }}/openapi.yaml || (exit 1)
