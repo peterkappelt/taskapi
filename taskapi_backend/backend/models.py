@@ -112,7 +112,7 @@ class SyncedRecord(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sync_config = models.ForeignKey(SyncConfig, on_delete=models.CASCADE)
 
-    notion_id = models.CharField(max_length=36)
+    notion_id = models.CharField(max_length=36, null=True)
 
     title = models.CharField(max_length=200)
     date_start = models.DateTimeField(null=True)

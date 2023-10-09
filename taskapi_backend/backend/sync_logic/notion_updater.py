@@ -1,6 +1,6 @@
 from typing import cast
 
-from ..integrations.notion import NotionApi
+from ..integrations.notion import NotionApi, NotionPageProps
 from ..eventbus import EventRecordChanged, EventBus
 from celery.utils.log import get_task_logger
 
@@ -18,7 +18,14 @@ def notion_change(e: EventRecordChanged):
     )  # explicit casting is necessary since userconnection is not typed by django
     assert api is not None
 
-    # do a full fetch-compare-update cycle
+    # if notion_id on the record is not set, it needs to be created
+    if rec.notion_id is None:
+        item = api.createDbItem(conf.notion_db, NotionPageProps.from_synced_record(rec))
+        rec.notion_id = item.id
+        rec.save()
+        return
+
+    # otherwise, do a full fetch-compare-update cycle
 
     # get task from notion
     task = api.getDbItem(rec.notion_id)
@@ -40,20 +47,7 @@ def notion_change(e: EventRecordChanged):
         return
 
     # finally, update record
-    props = {
-        "title": {"title": [{"type": "text", "text": {"content": rec.title}}]},
-    }
-    if rec.date_start is not None:
-        # TODO google tasks returns day-only format
-        # check and handle that here
-        props[conf.notion_db_date_prop_id] = {
-            "date": {"start": rec.date_start.isoformat()}
-        }
-    if rec.date_end is not None:
-        props[conf.notion_db_date_prop_id]["date"]["end"] = rec.date_end.isoformat()
-    if done is not None:
-        props[conf.notion_db_done_prop_id] = {"checkbox": rec.done}
-    api.patchDbItem(rec.notion_id, props)
+    api.patchDbItem(rec.notion_id, NotionPageProps.from_synced_record(rec))
 
 
 EventBus.subscribe(EventRecordChanged, notion_change)

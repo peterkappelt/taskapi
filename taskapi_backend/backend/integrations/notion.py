@@ -122,6 +122,28 @@ class NotionDbRecords:
         )
 
 
+class NotionPageProps:
+    @staticmethod
+    def from_synced_record(rec) -> object:
+        conf = rec.sync_config
+
+        props = {
+            "title": {"title": [{"type": "text", "text": {"content": rec.title}}]},
+        }
+        if rec.date_start is not None:
+            # TODO google tasks returns day-only format
+            # check and handle that here
+            props[conf.notion_db_date_prop_id] = {
+                "date": {"start": rec.date_start.isoformat()}
+            }
+        if rec.date_end is not None:
+            props[conf.notion_db_date_prop_id]["date"]["end"] = rec.date_end.isoformat()
+        if rec.done is not None:
+            props[conf.notion_db_done_prop_id] = {"checkbox": rec.done}
+
+        return props
+
+
 class NotionApi:
     def __init__(self, token: str):
         self.token = token
@@ -189,3 +211,13 @@ class NotionApi:
             json={"properties": props},
         )
         res.raise_for_status()
+
+    def createDbItem(self, db_id: str, props: object):
+        url = f"{API_BASE}/pages"
+        res = requests.post(
+            url,
+            headers=self._headers(),
+            json={"parent": {"database_id": db_id}, "properties": props},
+        )
+        res.raise_for_status()
+        return NotionDbRecord(res.json())
