@@ -34,15 +34,17 @@ import { useApi } from "../ApiContext";
 const notionConfSchema = z.object({
   notion_db: z.string({ required_error: "Please select a notion database" }),
   notion_db_date_prop_id: z.string(),
-  notion_db_done_prop_id: z.string().optional(),
+  notion_db_done_prop_id: z.string().optional().nullable(),
 });
 
 const NotionSyncConf = ({
   me,
   onSave,
+  initialValues,
 }: {
   me: Me;
   onSave: (args: z.infer<typeof notionConfSchema>) => any;
+  initialValues: Partial<z.infer<typeof notionConfSchema>>;
 }) => {
   const [notionDbs, setNotionDbs] = useState<NotionDbList[] | undefined>();
   const [dbInfo, setDbInfo] = useState<NotionDbInfo | undefined>();
@@ -50,9 +52,28 @@ const NotionSyncConf = ({
   const [open, setOpen] = useState(false);
   const form = useForm<z.infer<typeof notionConfSchema>>({
     resolver: zodResolver(notionConfSchema),
+    defaultValues: initialValues,
   });
-  console.log(form.getValues());
+
   useEffect(() => {
+    // fetch db info when a DB is given by default
+    let isActive = true;
+    const doFetch = async () => {
+      if (!initialValues.notion_db) return;
+      const data = await api.retrieveNotionDbInfo({
+        db_id: initialValues.notion_db,
+      });
+      if (!isActive) return;
+      setDbInfo(data);
+    };
+    doFetch();
+    return () => {
+      isActive;
+    };
+  }, [initialValues]);
+
+  useEffect(() => {
+    // fetch db info when another Notion DB is selected by the form
     let isActive = true;
     const { unsubscribe } = form.watch((value, { name }) => {
       if (name != "notion_db") return;

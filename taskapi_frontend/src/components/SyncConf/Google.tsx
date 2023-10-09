@@ -24,21 +24,24 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 const gTasksConfSchema = z.object({
-  g_tasks_tasklist: z.string({ required_error: "Pleases select a tasklist" }),
+  g_tasks_tasklist: z.string({ required_error: "Pleases select a tasklist" }).nullable(),
 });
 
 const GoogleSyncConf = ({
   me,
   onSave,
+  initialValues,
 }: {
   me: Me;
   onSave: (args: z.infer<typeof gTasksConfSchema>) => any;
+  initialValues: Partial<z.infer<typeof gTasksConfSchema>>;
 }) => {
   const [tasklists, setTasklists] = useState<GTasksTasklists[] | undefined>();
   const api = useApi();
 
   const gTasksForm = useForm<z.infer<typeof gTasksConfSchema>>({
     resolver: zodResolver(gTasksConfSchema),
+    defaultValues: initialValues,
   });
 
   useEffect(() => {

@@ -102,8 +102,14 @@ const MissingHint = ({
   );
 };
 
-const SyncConfEditor = ({ me }: { me: Me }) => {
-  const [conf, setConf] = useState<PartialSyncConfig>({});
+const SyncConfEditor = ({
+  me,
+  initialSyncConf,
+}: {
+  me: Me;
+  initialSyncConf?: SyncConfig;
+}) => {
+  const [conf, setConf] = useState<PartialSyncConfig>(initialSyncConf || {});
   const validation = useMemo(() => validateSyncConf(me, conf), [me, conf]);
   const api = useApi();
 
@@ -139,10 +145,18 @@ const SyncConfEditor = ({ me }: { me: Me }) => {
       {validation.missing.notion ? <NotionLoginCard action="connect" /> : null}
       {validation.missing.g_tasks ? <GoogleLoginCard action="connect" /> : null}
       {!validation.missing.notion ? (
-        <NotionSyncConf me={me} onSave={handleFormSave} />
+        <NotionSyncConf
+          me={me}
+          onSave={handleFormSave}
+          initialValues={initialSyncConf || {}}
+        />
       ) : null}
       {!validation.missing.g_tasks ? (
-        <GoogleSyncConf me={me} onSave={handleFormSave} />
+        <GoogleSyncConf
+          me={me}
+          onSave={handleFormSave}
+          initialValues={initialSyncConf || {}}
+        />
       ) : null}
       <MissingHint me={me} conf={conf} validation={validation} />
     </>
