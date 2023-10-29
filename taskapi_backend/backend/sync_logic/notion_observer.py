@@ -12,7 +12,9 @@ from ..eventbus import EventBus, EventRecordChanged
 
 @shared_task(name="dispatch_notion_observers")
 def dispatch_notion_observers():
-    group([run_notion_observer.s(s.id) for s in SyncConfig.objects.all()]).apply_async()
+    group(
+        [run_notion_observer.s(s.id) for s in SyncConfig.objects.filter(disabled=False)]
+    ).apply_async()
 
 
 @shared_task(name="run_notion_observer")

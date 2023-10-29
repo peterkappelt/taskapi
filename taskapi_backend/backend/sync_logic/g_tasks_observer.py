@@ -18,7 +18,9 @@ def dispatch_g_tasks_observers():
     group(
         [
             run_g_tasks_observer.s(s.id)
-            for s in SyncConfig.objects.filter(g_tasks_tasklist__isnull=False)
+            for s in SyncConfig.objects.filter(
+                g_tasks_tasklist__isnull=False, disabled=False
+            )
         ]
     ).apply_async()
 

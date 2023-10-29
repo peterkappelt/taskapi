@@ -89,6 +89,8 @@ class SyncConfig(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    disabled = models.BooleanField(default=False)
+
     notion_db = models.CharField(max_length=36)
     notion_db_date_prop_id = models.CharField(max_length=32)
     notion_db_done_prop_id = models.CharField(max_length=32, null=True)
