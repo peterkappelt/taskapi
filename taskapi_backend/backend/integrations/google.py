@@ -69,7 +69,11 @@ class GoogleTaskapi:
             client_secret=token.app.secret,
             token_uri="https://oauth2.googleapis.com/token",
         )
-        self.api = build("tasks", "v1", credentials=credentials)
+
+        # cache_discovery=False: https://github.com/googleapis/google-api-python-client/issues/299
+        # it will print a warning if not explicitely disabled.
+        # TODO: do we want some caching here? Seems useless to discover the API every time
+        self.api = build("tasks", "v1", credentials=credentials, cache_discovery=False)
 
     def taskLists(self):
         list = self.api.tasklists().list().execute()
