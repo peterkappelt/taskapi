@@ -5,6 +5,9 @@ from google.oauth2.credentials import Credentials
 from datetime import datetime
 from dataclasses import dataclass
 from allauth.socialaccount.models import SocialToken
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -61,10 +64,27 @@ class GoogleTaskCollection:
 
 class GoogleTaskapi:
     def __init__(self, token: SocialToken):
-        # TODO an expired token will be renewed automatically. store it in db when renewed
+        def _handle_refresh(request, scopes):
+            logger.info(f"Renewing google token for socialaccount {token.account.id}")
+            creds = Credentials(
+                token=token.token,
+                refresh_token=token.token_secret,
+                client_id=token.app.client_id,
+                client_secret=token.app.secret,
+                token_uri="https://oauth2.googleapis.com/token",
+                scopes=scopes,
+            )
+            creds.refresh(request)
+            token.token = creds.token
+            token.save()
+            return creds.token, creds.expiry
+
         credentials = Credentials(
             token=token.token,
-            refresh_token=token.token_secret,
+            # Don't provide a refresh token here, but the refresh handler.
+            # The refresh handler will refresh (using refresh_token), but
+            # also capture the new token and store it for subsequent use
+            refresh_handler=_handle_refresh,
             client_id=token.app.client_id,
             client_secret=token.app.secret,
             token_uri="https://oauth2.googleapis.com/token",
