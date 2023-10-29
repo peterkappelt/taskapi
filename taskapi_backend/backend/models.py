@@ -85,16 +85,6 @@ def save_user_connections(sender, instance, **kwargs):
     instance.userconnection.save()
 
 
-# class GoogleCon(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-#     last_access_token = models.TextField()
-
-#     def taskapi(self):
-#         return GoogleTaskapi(self.last_access_token)
-
-
 class SyncConfig(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
